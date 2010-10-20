@@ -2,5 +2,5 @@
 #require 'rake/testtask'
 
 task :cruise do
-  'rake spec'
+  'rspec spec/*'
 end
