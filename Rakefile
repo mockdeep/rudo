@@ -1,3 +1,7 @@
 task :cruise do
-  system('rspec spec/*')
+  if system('rspec spec/*') == 0
+    true
+  else
+    false
+  end
 end
