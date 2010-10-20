@@ -1,8 +1,8 @@
 require 'task'
 
 describe Task do
-#  it 'instantiates' do
-#    task = Task.new('stuff')
-#    task.name = 'do this'
-#  end
+  it 'creates a new instance and assigns a name' do
+    task = Task.new
+    task.name = 'buy groceries'
+  end
 end
