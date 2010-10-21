@@ -1,3 +1,3 @@
 class Task
-  #attr_accessor :name
+  attr_accessor :name
 end
