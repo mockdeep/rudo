@@ -1,11 +1,9 @@
 require 'dmconfig.rb'
 
-class Task
+class Project
   include DataMapper::Resource
   property :id,         Serial
-  property :title,      String
-
-  validates_presence_of :title
+  property :name,       String
 end
 
 DataMapper.auto_upgrade!
