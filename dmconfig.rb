@@ -4,4 +4,4 @@ require 'dm-migrations'
 require 'dm-validations'
 
 DataMapper::Logger.new($stdout, :debug)
-DataMapper.setup(:default, 'sqlite://' + Dir.pwd + '/redvelvet.db')
+DataMapper.setup(:default, 'sqlite://' + Dir.pwd + '/rv.db')
