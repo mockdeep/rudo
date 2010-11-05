@@ -1,4 +1,4 @@
-require 'redvelvet'
+require 'rvconfig'
 
 describe Project do
   it 'creates a new instance and assigns a title' do
@@ -12,6 +12,15 @@ describe Project do
   end
 
   it 'has many tasks' do
-    Project.new.should respond_to :tasks
+    project = Project.new
+    project.should respond_to :tasks
+    project.tasks.should == []
+    task1 = Task.new
+    task2 = Task.new
+    project.tasks << task1
+    project.tasks << task2
+    project.save!
+    project.tasks.should == [task1, task2]
   end
+
 end

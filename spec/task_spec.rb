@@ -1,4 +1,4 @@
-require 'redvelvet'
+require 'rvconfig'
 require 'time'
 
 describe Task do
@@ -17,11 +17,16 @@ describe Task do
   end
 
   it 'does not allow blank titles' do
-    task = Task.new.should_not be_valid
+    Task.new.should_not be_valid
+    Task.new.save!.should == false
   end
 
   it 'has notes' do
     Task.new.should respond_to :notes
+  end
+
+  it 'has contexts' do
+    Task.new.should respond_to :contexts
   end
 
   it 'has a project' do
