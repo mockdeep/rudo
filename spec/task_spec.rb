@@ -12,13 +12,13 @@ describe Task do
 
   it 'creates a new instance and assigns a title' do
     task = Task.new(:title => 'buy groceries')
-    task.save!
+    task.save
     Task.first(:title => 'buy groceries').should_not be_nil
   end
 
   it 'does not allow blank titles' do
     Task.new.should_not be_valid
-    Task.new.save!.should == false
+    Task.new.save.should == false
   end
 
   it 'has notes' do
