@@ -25,4 +25,12 @@ class Context
     self.save
   end
 
+  def move_down
+    temp = self.class.first(:ordering => self.ordering + 1)
+    temp.ordering -= 1
+    temp.save
+    self.ordering += 1
+    self.save
+  end
+
 end

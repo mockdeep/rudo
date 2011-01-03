@@ -29,6 +29,17 @@ describe Context do
     context2.ordering.should == context1.ordering - 1
   end
 
+  it 'can move a context down in the ordering' do
+    context1 = Context.new(:title => 'home')
+    context1.save
+    context2 = Context.new(:title => 'work')
+    context2.save
+    context1.move_down
+    context2.reload
+    context1.ordering.should == context2.ordering + 1
+    context2.ordering.should == context1.ordering - 1
+  end
+
   it 'has many tasks' do
     context = Context.new
     context.should respond_to :tasks
