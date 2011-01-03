@@ -1,0 +1,26 @@
+#!/usr/local/bin/ruby
+list_name = File.expand_path("~/Dropbox/bin/rudo/todo.txt")
+index = 0
+if ARGV.length > 0
+  if ARGV[0] == 'add'
+    if ARGV[1]
+      open(list_name, 'a') { |f| f.puts ARGV[1] }
+    else
+      puts 'you need to give me a task to toss in there'
+    end
+  elsif ARGV[0] == 'done'
+    tasks = File.readlines(list_name)
+    open(list_name, 'w') do |file|
+      file.puts tasks[1..-1]
+    end
+  else
+    puts 'invalid argument'
+  end
+  exit(0)
+end
+
+list = File.open(list_name, 'r')
+while ((item = list.gets) and index < 10) do
+  index += 1
+  puts item
+end

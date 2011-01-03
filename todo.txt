@@ -1,0 +1,13 @@
+create todo.txt with list items
+read list in and print first 10 items to screen
+parse argument 'add' to add item to end of list
+parse argument 'done' to remove item from beginning of list
+start adding/removing items from SQLite database
+look up RTM rubygems
+create shell script for 'rudone'
+link shell script to /usr/bin/
+do more stuff
+and a little more
+come up with more ideas for things to do with rudo
+add rudo 'walk' option to move first item to back of list
+stuff and more stuff
