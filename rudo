@@ -2,22 +2,35 @@
 require 'rubygems'
 require 'dm-core'
 require 'dm-migrations'
+require 'dm-aggregates'
 
+# uncomment the following line to see database output
 #DataMapper::Logger.new($stdout, :debug)
+# DataMapper is an ORM, we're using sqlite, cause it's easy
 DataMapper.setup(:default, 'sqlite://' + File.expand_path('~/todo.db'))
 
 class Task
   include DataMapper::Resource
   property :id,         Serial
   property :title,      String
+  property :ordering,      Integer
 
   def initialize(title)
     self.title = title
+    self.ordering = (self.class.max(:ordering) || 0) + 1
   end
 
   def to_s
-    self.title
+    self.ordering.to_s + '. ' + self.title
   end
+
+  before :destroy do |task|
+    self.class.all(:ordering.gt => task.ordering).each do |task2|
+      task2.ordering -= 1
+      task2.save
+    end
+  end
+
 end
 
 DataMapper.auto_upgrade!
@@ -25,9 +38,9 @@ DataMapper.finalize
 
 def print_tasks
   puts '*' * 40
-  Task.all.each_with_index do |task, index|
+  Task.all(:order => [ :ordering.asc ]).each_with_index do |task, index|
     break if index >= 10
-    puts (index+1).to_s + '. ' + task.to_s
+    puts task.to_s
   end
   puts '*' * 40
 end
@@ -90,7 +103,7 @@ when 'walk'
 
   # step through as many times as the user specified, default 1
   a.times do
-    Task.new(Task.first.to_s).save
+    Task.new(Task.first.title).save
     Task.first.destroy
   end
 
