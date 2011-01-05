@@ -1,26 +1,48 @@
 #!/usr/local/bin/ruby
-list_name = File.expand_path("~/Dropbox/bin/rudo/todo.txt")
-index = 0
-if ARGV.length > 0
-  if ARGV[0] == 'add'
-    if ARGV[1]
-      open(list_name, 'a') { |f| f.puts ARGV[1] }
-    else
-      puts 'you need to give me a task to toss in there'
-    end
-  elsif ARGV[0] == 'done'
-    tasks = File.readlines(list_name)
-    open(list_name, 'w') do |file|
-      file.puts tasks[1..-1]
-    end
-  else
-    puts 'invalid argument'
+require 'rubygems'
+require 'dm-core'
+require 'dm-migrations'
+
+#DataMapper::Logger.new($stdout, :debug)
+DataMapper.setup(:default, 'sqlite://' + File.expand_path('~/todo.db'))
+
+class Task
+  include DataMapper::Resource
+  property :id,         Serial
+  property :title,      String
+
+  def initialize(title)
+    self.title = title
   end
-  exit(0)
+
+  def to_s
+    self.title
+  end
 end
 
-list = File.open(list_name, 'r')
-while ((item = list.gets) and index < 10) do
-  index += 1
-  puts item
+DataMapper.auto_upgrade!
+DataMapper.finalize
+
+case ARGV[0]
+when 'add'
+  if ARGV[1]
+    Task.new(ARGV[1]).save
+  else
+    puts 'you need to give me a task to toss in there'
+  end
+when 'done'
+  Task.first.destroy
+when nil
+when 'walk'
+    Task.new(Task.first.to_s).save
+    Task.first.destroy
+else
+  puts 'invalid argument'
+  exit(0)
 end
+puts '*' * 40
+Task.all.each_with_index do |task, index|
+  break if index >= 10
+  puts task
+end
+puts '*' * 40
