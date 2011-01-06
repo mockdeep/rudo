@@ -3,17 +3,24 @@ require 'rubygems'
 require 'dm-core'
 require 'dm-migrations'
 require 'dm-aggregates'
-require 'task'
-require 'list'
+require File.join(File.dirname(__FILE__), 'task')
+require File.join(File.dirname(__FILE__), 'list')
 
 # uncomment the following line to see database output
 #DataMapper::Logger.new($stdout, :debug)
-# DataMapper is an ORM, we're using sqlite, cause it's easy
-DataMapper.setup(:default, 'sqlite://' + File.expand_path('~/todo.db'))
+
+# if you want to muck around without using your actual todo list, type 'export DEV=true' at the command line
+if ENV['DEV'] == 'true'
+  db_path = File.join(File.dirname(__FILE__), 'dev.db')
+else
+  db_path = File.expand_path('~/todo.db')
+end
+
+# DataMapper is an ORM, we're using sqlite as our database, 'cause it's easy
+DataMapper.setup(:default, 'sqlite://' + db_path)
 DataMapper.finalize
 DataMapper.auto_upgrade!
 
-# believe it or not, it all starts here
 begin
   if ARGV[0]
     if ARGV[1]
@@ -35,4 +42,3 @@ rescue Exception => ex
   puts ex.message
   puts "X"*40
 end
-
