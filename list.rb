@@ -3,11 +3,26 @@ class List
   # prints tasks to the screen
   def self.print_tasks
     puts '*' * 40
-    Task.all(:order => [ :ordering.asc ]).each_with_index do |task, index|
-      break if index >= 10
+    Task.all(:order => [ :ordering.asc ]).each do |task|
+      break if task.ordering > 5
       puts task.to_s
     end
     puts '*' * 40
+    puts "#{Task.count} tasks remaining"
+  end
+
+  def self.review
+    Task.all(:order => [ :ordering.asc ]).each do |task|
+      puts task.to_s
+      puts 'Done/Next (D/N)'
+      a = STDIN.gets.chomp
+      if a.upcase == 'D'
+        task.destroy
+        puts 'task deleted'
+      else
+        puts 'moving along'
+      end
+    end
   end
 
   # adds a task to the end of the list
