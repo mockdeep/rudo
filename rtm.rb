@@ -8,26 +8,19 @@ require 'rubygems'
 require 'xml/libxml'
 
 class Milker
+  # I've put my credentials and bits of info in a separate file
+  # This file is ignored by git.  Wouldn't want somebody using it to foul purposes
+  # in order to work with this you'll need to get your own, follow instructions at
+  # http://www.rememberthemilk.com/services/api/authentication.rtm
+  # TODO: the TOKEN should be moved out of cred.rb to the database
   include Cred
 
-  def self.get_list
-
-    # initially we're just looking to get a list of the tasks
+  def initialize
     @uri = URI.parse("http://api.rememberthemilk.com/services/rest/")
-    args={'api_key' => API_KEY, 'method' => 'rtm.tasks.getList'}
-    #sig = MD5.md5(API_SHARED_SECRET + args.sort.flatten.join).to_s
-    sig = get_signed(args)
-    puts "@uri.host: #{@uri.host} - @uri.path: #{@uri.path}"
-    puts "let's see if we can get a response:"
-    response = Net::HTTP.get_response(@uri.host, "#{@uri.path}?method=rtm.tasks.getList&api_key=#{API_KEY}&api_sig=#{sig}")
-    #response = Net::HTTP.get_response(@uri.host, "#{@uri.path}?api_key=#{API_KEY}&api_sig=#{sig}")
-    puts "----------------------------------------------------------------"
-    puts response.inspect
-    puts response.body
+    @token = TOKEN
   end
 
-  def self.get_frob
-    @uri = URI.parse("http://api.rememberthemilk.com/services/rest/")
+  def get_frob
     args = { 'api_key' => API_KEY, 'method' => 'rtm.auth.getFrob' }
     sig = get_signed(args)
     response = Net::HTTP.get_response(@uri.host, "#{@uri.path}?method=rtm.auth.getFrob&api_key=#{API_KEY}&api_sig=#{sig}")
@@ -35,29 +28,69 @@ class Milker
     puts "response class: " + response.class.to_s
     puts "response body class: " + response.body.class.to_s
     puts response.body
-    get_xml_element('frob', response.body)
+    @frob ||= get_xml_element('frob', response.body)
   end
 
-  def self.get_xml_element(elem, string)
-    #context = XML::Parser::Context.new
+  def get_xml_element(elem, string)
     parser = XML::Parser.string(string)
     doc = parser.parse
+    puts doc.to_s
     doc.find(elem).first.content
   end
 
-  def self.get_signed(args)
+  def get_signed(args)
     MD5.md5(API_SHARED_SECRET + args.sort.flatten.join).to_s
   end
 
-  def self.get_auth
-    frob = self.get_frob
-    @uri = URI.parse("http://www.rememberthemilk.com/services/auth/")
-    args = { 'api_key' => API_KEY, 'perms' => 'read', 'frob' => frob }
+  def get_auth
+    auth_uri = URI.parse("http://www.rememberthemilk.com/services/auth/")
+    args = { 'api_key' => API_KEY, 'perms' => 'read', 'frob' => get_frob }
     args['api_sig'] = get_signed(args)
-    address = "#{@uri.host}#{@uri.path}?#{args.keys.collect {|k| "#{CGI::escape(k).gsub(/ /,'+')}=#{CGI::escape(args[k]).gsub(/ /,'+')}"}.join('&')}"
+    address = "#{auth_uri.host}#{auth_uri.path}?#{args.keys.collect {|k| "#{CGI::escape(k).gsub(/ /,'+')}=#{CGI::escape(args[k]).gsub(/ /,'+')}"}.join('&')}"
     puts address.to_s
+    puts 'go to the above address to authenticate, then hit Enter'
+    gets
   end
 
+  def get_token
+    get_auth
+    args = { 'api_key' => API_KEY, 'frob' => get_frob, 'method' => 'rtm.auth.getToken' }
+    args['api_sig'] = get_signed(args)
+    response = Net::HTTP.get_response(@uri.host, "#{@uri.path}?#{args.keys.collect {|k| "#{CGI::escape(k).gsub(/ /,'+')}=#{CGI::escape(args[k]).gsub(/ /,'+')}"}.join('&')}")
+    puts response.inspect
+    puts response.body
+    token = get_xml_element('token', response.body)
+    puts "Token: " + token.to_s
+  end
+
+  def get_lists
+    args = { 'api_key' => API_KEY, 'method' => 'rtm.lists.getList', 'auth_token' => @token }
+    args['api_sig'] = get_signed(args)
+    response = get_response(args)
+    puts response.inspect
+    puts response.body
+  end
+
+  def get_all_tasks
+    args = { 'api_key' => API_KEY, 'method' => 'rtm.tasks.getList', 'auth_token' => @token }
+    args['api_sig'] = get_signed(args)
+    response = get_response(args)
+    puts response.inspect
+    puts response.body
+  end
+
+  def check_token
+    args = { 'api_key' => API_KEY, 'method' => 'rtm.auth.checkToken', 'auth_token' => @token }
+    args['api_sig'] = get_signed(args)
+    response = get_response(args)
+    puts response.inspect
+    puts response.body
+  end
+
+  def get_response(args)
+    Net::HTTP.get_response(@uri.host, "#{@uri.path}?#{args.keys.collect {|k| "#{CGI::escape(k).gsub(/ /,'+')}=#{CGI::escape(args[k]).gsub(/ /,'+')}"}.join('&')}")
+  end
 end
-Milker.get_auth
-#puts "here's your frob: " + Milker.get_frob
+
+a = Milker.new
+a.get_all_tasks
