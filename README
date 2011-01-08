@@ -1,0 +1,24 @@
+Rudo is a simple command line based todo list editor.  Here are the commands:
+
+# add a task to the list
+rudo add 'my task'
+
+# mark the first task finished
+rudo done
+
+# mark the 5th task finished
+rudo done 5
+
+# mark the first 3 tasks finished
+rudo done 3x
+
+# move the first item to the back of the list
+rudo walk
+
+# move the first 3 items to the back of the list
+rudo walk 3
+
+# step through all the tasks in your list, with option to delete
+rudo review
+
+More to come, including integration with Remember the Milk and more advanced list management tools
