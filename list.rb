@@ -36,7 +36,12 @@ class List
   def self.done(identifier=nil)
     # if there aren't any items in the list...
     raise "there's nothing on your list!" if Task.all.empty?
-    if identifier
+    if identifier and identifier.match(/(\d+)x/)
+      count = Integer($1)
+      count.times do
+        Task.first(:ordering => 1).destroy
+      end
+    elsif identifier
       begin
         # Integer throws an error if 'identifier' contains anything that isn't numerical
         # begin-rescue anticipates this, and the rescue block is executed if an error is raised
