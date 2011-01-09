@@ -1,7 +1,7 @@
 class List
 
   # prints tasks to the screen
-  def self.print_tasks
+  def print_tasks
     puts '*' * 40
     Task.all(:order => [ :ordering.asc ]).each do |task|
       break if task.ordering > 5
@@ -11,29 +11,58 @@ class List
     puts "#{Task.count} tasks remaining"
   end
 
-  def self.review
-    Task.all(:order => [ :ordering.asc ]).each do |task|
+  def qad(title=nil)
+    task = Task.new(title)
+    task.quick = true
+    task.save
+    puts "added quick task -> #{task.title}"
+  end
+
+  def quick
+    puts '*' * 40
+    count = 0
+    Task.all(:quick => true, :order => [ :ordering.asc ]).each do |task|
+      count += 1
       puts task.to_s
-      puts 'Done/Next (D/N)'
+    end
+    puts '*' * 40
+    puts "#{count} quick tasks remaining"
+    puts "#{Task.count} tasks remaining"
+  end
+
+  def review
+    count = Task.count
+    counter = 0
+    Task.all(:order => [ :ordering.asc ]).each do |task|
+      counter += 1
+      puts '-' * 40
+      puts "(#{counter}/#{count}) #{(task.quick ? 'quick' : 'slow')} -> #{task.title}"
+      print 'Done or change speed (D/S), hit enter to go to next task -> '
+      $stdout.flush
       a = STDIN.gets.chomp
       if a.upcase == 'D'
         task.destroy
-        puts 'task deleted'
-      else
-        puts 'moving along'
+        sleep 1
+      elsif a.upcase == 'S'
+        task.quick = !task.quick
+        puts "changed to #{task.speed}"
+        task.save
+        sleep 1
       end
     end
+    puts '-' * 40
   end
 
   # adds a task to the end of the list
-  def self.add(title=nil)
+  def add(title=nil)
     raise 'you need to enter a title' unless title
     raise 'that task is already in the list' if Task.first(:title => title)
     Task.new(title).save
+    puts "added task -> #{title}"
   end
 
   # removes a task from the list, the first one unless otherwise specified
-  def self.done(identifier=nil)
+  def done(identifier=nil)
     # if there aren't any items in the list...
     raise "there's nothing on your list!" if Task.all.empty?
     if identifier and identifier.match(/(\d+)x/)
@@ -54,10 +83,11 @@ class List
     else
       Task.first(:ordering => 1).destroy
     end
+    print_tasks
   end
 
   # moves items from the beginning to the end of the list, one by default
-  def self.walk(number=1)
+  def walk(number=1)
     # if there aren't any items in the list...
     raise "you're walking in place" if Task.all.empty?
     begin
@@ -89,6 +119,7 @@ class List
       task.ordering = Task.min(:ordering) - 1
       task.save
     end
-  end
 
+    print_tasks
+  end
 end

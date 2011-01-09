@@ -22,15 +22,17 @@ DataMapper.finalize
 DataMapper.auto_upgrade!
 
 begin
+  list = List.new
   if ARGV[0]
     if ARGV[1]
       # send tries to call the method with the name in ARGV[0]
-      List.send(ARGV[0], ARGV[1])
+      list.send(ARGV[0], ARGV[1])
     else
-      List.send(ARGV[0])
+      list.send(ARGV[0])
     end
+  else
+    list.print_tasks
   end
-  List.print_tasks
 rescue NoMethodError => ex
   # catch the error where List doesn't have the method from ARGV[0]
   puts "X"*40
