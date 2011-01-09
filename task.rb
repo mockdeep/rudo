@@ -1,8 +1,5 @@
-require 'colors'
-
 class Task
   include DataMapper::Resource
-  include Colors
   property :id,         Serial
   property :title,      String
   property :ordering,   Integer
@@ -18,8 +15,12 @@ class Task
   end
 
   def to_s
-    color = (quick ? :blue : :yellow)
-    self.ordering.to_s + ". \e[#{COLORS[color]}m#{self.title}\e[0m"
+    if ENV['COLOR']=='true'
+      color = (quick ? :blue : :yellow)
+      return "#{self.ordering.to_s}. \e[#{Colors::COLORS[color]}m#{self.title}\e[0m"
+    else
+      return "#{self.ordering.to_s}. #{self.title}"
+    end
   end
 
   before :destroy do |task|
