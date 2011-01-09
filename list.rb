@@ -36,15 +36,20 @@ class List
     Task.all(:order => [ :ordering.asc ]).each do |task|
       counter += 1
       puts '-' * 40
-      puts "(#{counter}/#{count}) #{(task.quick ? 'quick' : 'slow')} -> #{task.title}"
-      print 'Done or change speed (D/S), hit enter to go to next task -> '
+      puts "(#{counter}/#{count}) #{task.to_s}"
+      print "Done (D), or switch to #{task.quick ? 'slow (S)' : 'quick (Q)'}, hit enter to go to next task -> "
       $stdout.flush
       a = STDIN.gets.chomp
       if a.upcase == 'D'
         task.destroy
         sleep 1
+      elsif a.upcase == 'Q'
+        task.quick = true
+        puts "changed to #{task.speed}"
+        task.save
+        sleep 1
       elsif a.upcase == 'S'
-        task.quick = !task.quick
+        task.quick = false
         puts "changed to #{task.speed}"
         task.save
         sleep 1

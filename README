@@ -18,7 +18,13 @@ rudo walk
 # move the first 3 items to the back of the list
 rudo walk 3
 
-# step through all the tasks in your list, with option to delete
+# step through all the tasks in your list, with option to delete and switch speed
 rudo review
+
+# add a quick task
+rudo qad 'my task'
+
+# see only quick tasks
+rudo quick
 
 More to come, including integration with Remember the Milk and more advanced list management tools

@@ -1,5 +1,8 @@
+require 'colors'
+
 class Task
   include DataMapper::Resource
+  include Colors
   property :id,         Serial
   property :title,      String
   property :ordering,   Integer
@@ -15,7 +18,8 @@ class Task
   end
 
   def to_s
-    self.ordering.to_s + '. ' + self.title
+    color = (quick ? :blue : :yellow)
+    self.ordering.to_s + ". \e[#{COLORS[color]}m#{self.title}\e[0m"
   end
 
   before :destroy do |task|
