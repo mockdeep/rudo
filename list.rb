@@ -27,6 +27,11 @@ class List
 
   def quick(item=nil, quickness=true)
     if item
+      begin
+        item = Integer(item)
+      rescue
+        raise 'that is not an integer, try again'
+      end
       task = Task.first(:ordering => item)
       task.quick = quickness
       task.save
@@ -143,5 +148,27 @@ class List
     end
 
     print_tasks
+  end
+
+  def change(number=nil)
+    raise 'change should be followed by the number of a task' unless number
+    begin
+      number = Integer(number)
+    rescue
+      raise 'change should be followed by the number of a task'
+    end
+    raise "you don't have that many tasks" if number > Task.count
+    task = Task.first(:ordering => number)
+    puts "Enter new title for task -> #{task.title}"
+    print "-> "
+    $stdout.flush
+    a = STDIN.gets.chomp
+    if a == ''
+      raise 'you need to enter a task name'
+    else
+      task.title = a
+      task.save
+      puts "Title changed to -> #{task.title}"
+    end
   end
 end
