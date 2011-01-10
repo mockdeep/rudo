@@ -7,11 +7,7 @@ class List
       puts task.to_s
     end
     puts '*' * 40
-    if ENV['COLOR']=='true'
-      puts "\e[#{Colors::COLORS[:green]}m#{Task.count} tasks remaining\e[0m"
-    else
-      puts "#{Task.count} tasks remaining"
-    end
+    puts Colors.colored("#{Task.count} tasks remaining", :green)
   end
 
   def all

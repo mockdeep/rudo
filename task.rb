@@ -15,12 +15,8 @@ class Task
   end
 
   def to_s
-    if ENV['COLOR']=='true'
-      color = (quick ? :blue : :yellow)
-      return "#{self.ordering.to_s}. \e[#{Colors::COLORS[color]}m#{self.title}\e[0m"
-    else
-      return "#{self.ordering.to_s}. #{self.title}"
-    end
+    color = (quick ? :blue : :yellow)
+    Colors.colored("#{self.ordering.to_s}. #{self.title}", color)
   end
 
   before :destroy do |task|
@@ -32,5 +28,4 @@ class Task
       task2.save
     end
   end
-
 end
