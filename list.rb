@@ -1,14 +1,21 @@
 class List
 
   # prints tasks to the screen
-  def print_tasks
+  def print_tasks(task_limit=5)
     puts '*' * 40
-    Task.all(:order => [ :ordering.asc ]).each do |task|
-      break if task.ordering > 5
+    Task.all(:order => [ :ordering.asc ], :limit => task_limit).each do |task|
       puts task.to_s
     end
     puts '*' * 40
-    puts "#{Task.count} tasks remaining"
+    if ENV['COLOR']=='true'
+      puts "\e[#{Colors::COLORS[:green]}m#{Task.count} tasks remaining\e[0m"
+    else
+      puts "#{Task.count} tasks remaining"
+    end
+  end
+
+  def all
+    print_tasks(Task.count)
   end
 
   def qad(title=nil)
@@ -64,6 +71,7 @@ class List
     raise 'that task is already in the list' if Task.first(:title => title)
     Task.new(title).save
     puts "added task -> #{title}"
+    print_tasks
   end
 
   # removes a task from the list, the first one unless otherwise specified
