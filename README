@@ -33,4 +33,11 @@ rudo qad 'my task'
 # see only quick tasks
 rudo quick
 
+# see only slow tasks
+rudo slow
+
+# mark a particular task as quick or slow
+rudo quick 3
+rudo slow 5
+
 More to come, including integration with Remember the Milk and more advanced list management tools

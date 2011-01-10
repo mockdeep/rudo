@@ -25,16 +25,25 @@ class List
     puts "added quick task -> #{task.title}"
   end
 
-  def quick
-    puts '*' * 40
-    count = 0
-    Task.all(:quick => true, :order => [ :ordering.asc ]).each do |task|
-      count += 1
-      puts task.to_s
+  def quick(item=nil, quickness=true)
+    if item
+      task = Task.first(:ordering => item)
+      task.quick = quickness
+      task.save
+      puts "task now set to quick -> #{task.title}"
+    else
+      puts '*' * 40
+      Task.all(:quick => quickness, :order => [ :ordering.asc ]).each do |task|
+        puts task.to_s
+      end
+      puts '*' * 40
     end
-    puts '*' * 40
-    puts "#{count} quick tasks remaining"
+    puts "#{Task.count(:quick => quickness)} #{quickness ? 'quick' : 'slow'} tasks remaining"
     puts "#{Task.count} tasks remaining"
+  end
+
+  def slow(item=nil)
+    quick(item, false)
   end
 
   def review
