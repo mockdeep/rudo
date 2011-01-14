@@ -11,7 +11,9 @@ require File.join(File.dirname(__FILE__), 'colors')
 #DataMapper::Logger.new($stdout, :debug)
 
 # if you want to muck around without using your actual todo list, type 'export DEV=true' at the command line
-if ENV['DEV'] == 'true'
+development = (ENV['DEV'] == 'true')
+puts Colors.colored('--> in development mode <--', :red) if development
+if development
   db_path = File.join(File.dirname(__FILE__), 'dev.db')
 else
   db_path = File.expand_path('~/todo.db')
@@ -39,9 +41,11 @@ rescue NoMethodError => ex
   puts "X"*40
   puts "no such option, try 'add', 'done', or 'walk'"
   puts "X"*40
+  puts ex.backtrace if development
 rescue Exception => ex
   # catch and print errors raised by the call to List
   puts "X"*40
   puts ex.message
   puts "X"*40
+  puts ex.backtrace if development
 end

@@ -1,12 +1,18 @@
 class List
 
   # prints tasks to the screen
-  def print_tasks(task_limit=5)
+  def print_tasks(task_limit=5, conditions={})
     puts '*' * 40
-    Task.all(:order => [ :ordering.asc ], :limit => task_limit).each do |task|
-      puts task.to_s
+    conditions[:order] = [ :ordering.asc ]
+    conditions[:limit] = task_limit
+    quickness = conditions[:quick]
+    Task.all(conditions).each_with_index do |task, index|
+      puts "#{quickness.nil? ? (index+1).to_s + '. ': ''}#{task.to_s}"
     end
     puts '*' * 40
+    unless quickness.nil?
+      puts Colors.colored("#{Task.count(:quick => quickness)} #{quickness ? 'quick' : 'slow'} tasks remaining", :green)
+    end
     puts Colors.colored("#{Task.count} tasks remaining", :green)
   end
 
@@ -14,33 +20,20 @@ class List
     print_tasks(Task.count)
   end
 
-  def qad(title=nil)
-    task = Task.new(title)
-    task.quick = true
-    task.save
-    puts "added quick task -> #{task.title}"
-  end
-
   def quick(item=nil, quickness=true)
     if item
       begin
-        item = Integer(item)
+        number = Integer(item)
+        task = Task.first(:ordering => number)
+        task.quick = quickness
+        task.save
+        puts "task now set to quick -> #{task.title}"
       rescue
-        raise 'that is not an integer, try again'
+        add(item, quickness)
       end
-      task = Task.first(:ordering => item)
-      task.quick = quickness
-      task.save
-      puts "task now set to quick -> #{task.title}"
     else
-      puts '*' * 40
-      Task.all(:quick => quickness, :order => [ :ordering.asc ]).each do |task|
-        puts task.to_s
-      end
-      puts '*' * 40
+      print_tasks(Task.count, :quick => quickness)
     end
-    puts "#{Task.count(:quick => quickness)} #{quickness ? 'quick' : 'slow'} tasks remaining"
-    puts "#{Task.count} tasks remaining"
   end
 
   def slow(item=nil)
@@ -76,12 +69,12 @@ class List
   end
 
   # adds a task to the end of the list
-  def add(title=nil)
+  def add(title=nil, quickness=false)
     raise 'you need to enter a title' unless title
     raise 'that task is already in the list' if Task.first(:title => title)
-    Task.new(title).save
+    Task.new(title, quickness).save
     puts "added task -> #{title}"
-    print_tasks
+    print_tasks(5, :quick => quickness)
   end
 
   # removes a task from the list, the first one unless otherwise specified
@@ -91,20 +84,20 @@ class List
     if identifier and identifier.match(/(\d+)x/)
       count = Integer($1)
       count.times do
-        Task.first(:ordering => 1).destroy
+        Task.first.destroy
       end
     elsif identifier
       begin
         # Integer throws an error if 'identifier' contains anything that isn't numerical
         # begin-rescue anticipates this, and the rescue block is executed if an error is raised
-        Task.first(:ordering => Integer(identifier)).destroy
+        Task.all(:order => [ :ordering.asc ])[Integer(identifier)-1].destroy
       rescue
         # if 'identifier' wasn't a number, let's see if we have a task with that title instead
         task = Task.first(:title => identifier)
         task ? task.destroy : (raise "'done' should be followed by either the number or title of a task")
       end
     else
-      Task.first(:ordering => 1).destroy
+      Task.first(:order => :ordering).destroy
     end
     print_tasks
   end
