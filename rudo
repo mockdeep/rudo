@@ -6,6 +6,7 @@ require 'dm-aggregates'
 require File.join(File.dirname(__FILE__), 'task')
 require File.join(File.dirname(__FILE__), 'list')
 require File.join(File.dirname(__FILE__), 'colors')
+require File.join(File.dirname(__FILE__), 'rtm')
 
 # uncomment the following line to see database output
 #DataMapper::Logger.new($stdout, :debug)

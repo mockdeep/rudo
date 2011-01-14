@@ -71,10 +71,46 @@ class List
   # adds a task to the end of the list
   def add(title=nil, quickness=false)
     raise 'you need to enter a title' unless title
-    raise 'that task is already in the list' if Task.first(:title => title)
-    Task.new(title, quickness).save
-    puts "added task -> #{title}"
+    if Task.first(:title => title)
+      puts "task already in list -> #{title}"
+    else
+      Task.new(title, quickness).save
+      puts "added task -> #{title}"
+    end
     print_tasks(5, :quick => quickness)
+  end
+
+  def tag(identifier=nil)
+    if identifier.nil?
+      puts 'listing of tags'
+      Tag.each do |tag|
+        puts tag.title
+      end
+    elsif identifier.match(/^(\d+)$/)
+      task = Task.all(:order => [ :ordering.asc ])[Integer(identifier)-1]
+      puts "Enter tag name for task -> #{task.title}"
+      print "-> "
+      $stdout.flush
+      a = STDIN.gets.chomp
+      if a == ''
+        raise 'you need to enter a tag name'
+      else
+        t = Tag.first(:title => a) || Tag.new(title)
+        task.tags << t
+        task.save
+        puts "Tag added -> #{t.title}"
+      end
+    elsif identifier == ''
+      puts "items without tags"
+      Task.all.each do |task|
+        puts task if task.tags.empty?
+      end
+    else
+      puts "listing tasks associated with tag -> #{identifier}"
+      Task.all.each do |task|
+        puts task if task.tags.collect{|tasktag| tasktag.title}.include? identifier
+      end
+    end
   end
 
   # removes a task from the list, the first one unless otherwise specified
@@ -158,6 +194,13 @@ class List
       task.title = a
       task.save
       puts "Title changed to -> #{task.title}"
+    end
+  end
+
+  def rtm_add
+    a = Milker.new
+    a.get_todays_tasks.each do |task|
+      add(task)
     end
   end
 end

@@ -44,4 +44,16 @@ rudo slow 5
 # change the title of a task
 rudo change 3
 
+# list tags
+rudo tag
+
+# list items associated with a tag
+rudo tag 'blah'
+
+# add a tag to an item
+rudo tag 3
+
+# add in tasks from Remember the Milk
+rudo rtm_add
+
 More to come, including integration with Remember the Milk and more advanced list management tools

@@ -3,9 +3,10 @@ require 'net/http'
 require 'md5'
 require 'cgi'
 require 'uri'
-require 'cred'
+require File.join(File.dirname(__FILE__), 'cred')
 require 'rubygems'
 require 'xml/libxml'
+require 'json'
 
 class Milker
   # I've put my credentials and bits of info in a separate file
@@ -42,6 +43,10 @@ class Milker
     MD5.md5(API_SHARED_SECRET + args.sort.flatten.join).to_s
   end
 
+  def standard_args
+    args = { 'api_key' => API_KEY, 'auth_token' => @token, 'format' => 'json' }
+  end
+
   def get_auth
     auth_uri = URI.parse("http://www.rememberthemilk.com/services/auth/")
     args = { 'api_key' => API_KEY, 'perms' => 'read', 'frob' => get_frob }
@@ -64,7 +69,7 @@ class Milker
   end
 
   def get_lists
-    args = { 'api_key' => API_KEY, 'method' => 'rtm.lists.getList', 'auth_token' => @token }
+    args = standard_args.merge('method' => 'rtm.lists.getList')
     args['api_sig'] = get_signed(args)
     response = get_response(args)
     puts response.inspect
@@ -72,11 +77,30 @@ class Milker
   end
 
   def get_all_tasks
-    args = { 'api_key' => API_KEY, 'method' => 'rtm.tasks.getList', 'auth_token' => @token }
+    args = standard_args.merge('method' => 'rtm.tasks.getList')
     args['api_sig'] = get_signed(args)
     response = get_response(args)
     puts response.inspect
     puts response.body
+  end
+
+  def get_todays_tasks
+    args = standard_args.merge('method' => 'rtm.tasks.getList', 'filter' => "status:incomplete AND (dueBefore:today OR due:today)")
+    args['api_sig'] = get_signed(args)
+    response = get_response(args)
+    a = JSON.parse(response.body)['rsp']['tasks']['list']
+    ourlist = []
+    a.each do |list|
+      series = list['taskseries']
+      if series.is_a? Array
+        series.each do |item|
+          ourlist << item['name']
+        end
+      else
+        ourlist << list['taskseries']['name']
+      end
+    end
+    ourlist
   end
 
   def check_token
@@ -91,6 +115,3 @@ class Milker
     Net::HTTP.get_response(@uri.host, "#{@uri.path}?#{args.keys.collect {|k| "#{CGI::escape(k).gsub(/ /,'+')}=#{CGI::escape(args[k]).gsub(/ /,'+')}"}.join('&')}")
   end
 end
-
-a = Milker.new
-a.get_all_tasks
