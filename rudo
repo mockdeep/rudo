@@ -6,6 +6,7 @@ require 'dm-aggregates'
 require File.join(File.dirname(__FILE__), 'task')
 require File.join(File.dirname(__FILE__), 'list')
 require File.join(File.dirname(__FILE__), 'colors')
+require File.join(File.dirname(__FILE__), 'quicker')
 require File.join(File.dirname(__FILE__), 'rtm')
 
 # uncomment the following line to see database output
@@ -26,7 +27,7 @@ DataMapper.finalize
 DataMapper.auto_upgrade!
 
 begin
-  list = List.new
+  list = List.first || List.new
   if ARGV[0]
     if ARGV[1]
       # send tries to call the method with the name in ARGV[0]

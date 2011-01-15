@@ -1,10 +1,21 @@
 class List
+  include DataMapper::Resource
+  property :id,           Serial
+  property :mode,        Integer
+  property :mode_string, String
+  property :print_count, Integer
+  Modes = { :regular => 0, :quick => 1, :slow => 2, :tag => 3 }
+
+  def initialize(mode=:regular, print_count=5)
+    self.mode = Modes[mode]
+    self.print_count = print_count
+  end
 
   # prints tasks to the screen
-  def print_tasks(task_limit=5, conditions={})
+  def print_tasks(conditions={})
     puts '*' * 40
     conditions[:order] = [ :ordering.asc ]
-    conditions[:limit] = task_limit
+    conditions[:limit] = print_count || Task.count
     quickness = conditions[:quick]
     Task.all(conditions).each_with_index do |task, index|
       puts "#{quickness.nil? ? (index+1).to_s + '. ': ''}#{task.to_s}"
@@ -17,27 +28,21 @@ class List
   end
 
   def all
-    print_tasks(Task.count)
+    self.print_count = Task.count
+    print_tasks
   end
 
-  def quick(item=nil, quickness=true)
-    if item
-      begin
-        number = Integer(item)
-        task = Task.first(:ordering => number)
-        task.quick = quickness
-        task.save
-        puts "task now set to quick -> #{task.title}"
-      rescue
-        add(item, quickness)
-      end
+  def set_count(count)
+    if count == 'all'
+      self.print_count = nil
+      self.save
+    elsif count.match(/^(\d+)$/)
+      self.print_count = count
+      self.save
     else
-      print_tasks(Task.count, :quick => quickness)
+      raise "invalid input, try 'all' or an integer"
     end
-  end
-
-  def slow(item=nil)
-    quick(item, false)
+    print_tasks
   end
 
   def review
@@ -77,7 +82,7 @@ class List
       Task.new(title, quickness).save
       puts "added task -> #{title}"
     end
-    print_tasks(5, :quick => quickness)
+    print_tasks(:quick => quickness)
   end
 
   def tag(identifier=nil)
@@ -194,13 +199,6 @@ class List
       task.title = a
       task.save
       puts "Title changed to -> #{task.title}"
-    end
-  end
-
-  def rtm_add
-    a = Milker.new
-    a.get_todays_tasks.each do |task|
-      add(task)
     end
   end
 end

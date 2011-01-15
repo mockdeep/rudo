@@ -115,3 +115,12 @@ class Milker
     Net::HTTP.get_response(@uri.host, "#{@uri.path}?#{args.keys.collect {|k| "#{CGI::escape(k).gsub(/ /,'+')}=#{CGI::escape(args[k]).gsub(/ /,'+')}"}.join('&')}")
   end
 end
+
+class List
+  def rtm_add
+    a = Milker.new
+    a.get_todays_tasks.each do |task|
+      add(task)
+    end
+  end
+end
