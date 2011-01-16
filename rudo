@@ -6,17 +6,15 @@ require 'dm-aggregates'
 require File.join(File.dirname(__FILE__), 'task')
 require File.join(File.dirname(__FILE__), 'list')
 require File.join(File.dirname(__FILE__), 'colors')
-require File.join(File.dirname(__FILE__), 'quicker')
 require File.join(File.dirname(__FILE__), 'rtm')
-
-# uncomment the following line to see database output
-#DataMapper::Logger.new($stdout, :debug)
 
 # if you want to muck around without using your actual todo list, type 'export DEV=true' at the command line
 development = (ENV['DEV'] == 'true')
 puts Colors.colored('--> in development mode <--', :red) if development
 if development
   db_path = File.join(File.dirname(__FILE__), 'dev.db')
+  # uncomment the following line to see database output in dev mode
+  # DataMapper::Logger.new($stdout, :debug)
 else
   db_path = File.expand_path('~/todo.db')
 end
@@ -29,21 +27,24 @@ DataMapper.auto_upgrade!
 begin
   list = List.first || List.new
   if ARGV[0]
-    if ARGV[1]
-      # send tries to call the method with the name in ARGV[0]
-      list.send(ARGV[0], ARGV[1])
+    if list.methods.include? ARGV[0]
+      if ARGV[1]
+        list.send(ARGV[0], ARGV[1])
+      else
+        list.send(ARGV[0])
+      end
+    elsif Tag.all.collect{|tag|tag.title}.include? ARGV[0]
+      if ARGV[1]
+        list.tag(ARGV[0], ARGV[1])
+      else
+        list.tag(ARGV[0])
+      end
     else
-      list.send(ARGV[0])
+      raise "invalid argument, try 'add', 'done', or 'tag'"
     end
   else
     list.print_tasks
   end
-rescue NoMethodError => ex
-  # catch the error where List doesn't have the method from ARGV[0]
-  puts "X"*40
-  puts "no such option, try 'add', 'done', or 'walk'"
-  puts "X"*40
-  puts ex.backtrace if development
 rescue Exception => ex
   # catch and print errors raised by the call to List
   puts "X"*40

@@ -27,20 +27,6 @@ rudo walk 3
 # step through all the tasks in your list, with option to delete and switch speed
 rudo review
 
-# add a quick/slow task
-rudo quick 'my task'
-rudo slow 'my slow task'
-
-# see only quick tasks
-rudo quick
-
-# see only slow tasks
-rudo slow
-
-# mark a particular task as quick or slow
-rudo quick 3
-rudo slow 5
-
 # change the title of a task
 rudo change 3
 

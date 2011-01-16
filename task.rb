@@ -3,24 +3,19 @@ class Task
   property :id,         Serial
   property :title,      String
   property :ordering,   Integer
-  property :quick,      Boolean, :default => false
 
   has n, :taggings
   has n, :tags, :through => :taggings
 
-  def initialize(title, quickness)
+  def initialize(title)
     self.title = title
-    self.quick = quickness
     self.ordering = (self.class.max(:ordering) || 0) + 1
   end
 
-  def speed
-    self.quick ? 'quick' : 'slow'
-  end
-
   def to_s
-    color = (quick ? :blue : :yellow)
-    Colors.colored("#{self.title}", color)
+    tag = self.tags.first
+    color = ( tag ? tag.color : :white )
+    Colors.colored("#{self.title}", color )
   end
 
   before :destroy do |task|
@@ -34,11 +29,13 @@ class Tag
   include DataMapper::Resource
   property :id,         Serial
   property :title,      String
-  has n,   :taggings     
+  property :color,      String
+  has n,   :taggings
   has n,   :tasks, :through => :taggings
 
   def initialize(title)
     self.title = title
+    self.color = :white
   end
 end
 

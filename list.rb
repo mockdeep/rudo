@@ -1,28 +1,28 @@
 class List
   include DataMapper::Resource
   property :id,           Serial
-  property :mode,        Integer
-  property :mode_string, String
-  property :print_count, Integer
-  Modes = { :regular => 0, :quick => 1, :slow => 2, :tag => 3 }
+  property :print_count,  Integer
+  property :last_tag,     String
 
-  def initialize(mode=:regular, print_count=5)
-    self.mode = Modes[mode]
+  def initialize(print_count=5)
     self.print_count = print_count
   end
 
   # prints tasks to the screen
-  def print_tasks(conditions={})
+  def print_tasks(tasks=nil)
     puts '*' * 40
-    conditions[:order] = [ :ordering.asc ]
-    conditions[:limit] = print_count || Task.count
-    quickness = conditions[:quick]
-    Task.all(conditions).each_with_index do |task, index|
-      puts "#{quickness.nil? ? (index+1).to_s + '. ': ''}#{task.to_s}"
+    if tasks.nil? and self.last_tag
+      tasks = Tag.first(:title => self.last_tag, :limit => self.print_count).tasks
+    elsif tasks.nil?
+      self.print_count ||= Task.count
+      tasks = Task.all(:limit => self.print_count, :order => [ :ordering.asc ])
+    end
+    tasks.all.each_with_index do |task, index|
+      puts "#{(index+1).to_s + '. '}#{task.to_s}"
     end
     puts '*' * 40
-    unless quickness.nil?
-      puts Colors.colored("#{Task.count(:quick => quickness)} #{quickness ? 'quick' : 'slow'} tasks remaining", :green)
+    unless self.last_tag.nil?
+      puts Colors.colored("#{Tag.first(:title => self.last_tag).tasks.count} #{self.last_tag} tasks remaining", :green)
     end
     puts Colors.colored("#{Task.count} tasks remaining", :green)
   end
@@ -52,21 +52,11 @@ class List
       counter += 1
       puts '-' * 40
       puts "(#{counter}/#{count}) #{task.to_s}"
-      print "Done (D), or switch to #{task.quick ? 'slow (S)' : 'quick (Q)'}, hit enter to go to next task -> "
+      print "Done (D) or hit enter to go to next task -> "
       $stdout.flush
       a = STDIN.gets.chomp
       if a.upcase == 'D'
         task.destroy
-        sleep 1
-      elsif a.upcase == 'Q'
-        task.quick = true
-        puts "changed to #{task.speed}"
-        task.save
-        sleep 1
-      elsif a.upcase == 'S'
-        task.quick = false
-        puts "changed to #{task.speed}"
-        task.save
         sleep 1
       end
     end
@@ -74,15 +64,15 @@ class List
   end
 
   # adds a task to the end of the list
-  def add(title=nil, quickness=false)
+  def add(title=nil)
     raise 'you need to enter a title' unless title
     if Task.first(:title => title)
       puts "task already in list -> #{title}"
     else
-      Task.new(title, quickness).save
+      Task.new(title).save
       puts "added task -> #{title}"
     end
-    print_tasks(:quick => quickness)
+    print_tasks
   end
 
   def tag(identifier=nil)
@@ -200,5 +190,11 @@ class List
       task.save
       puts "Title changed to -> #{task.title}"
     end
+  end
+
+  def test
+    Task.all(:order => [ :ordering.asc ])[9].to_a
+    Task.first(:offset => 9, :order => [ :ordering.asc ]).to_a
+    Task.all(:limit => 10, :offset => 9, :order => [ :ordering.asc ]).to_a
   end
 end
