@@ -10,7 +10,7 @@ require File.join(File.dirname(__FILE__), 'rtm')
 
 # if you want to muck around without using your actual todo list, type 'export DEV=true' at the command line
 development = (ENV['DEV'] == 'true')
-puts Colors.colored('--> in development mode <--', :red) if development
+puts Colors.colored('--> in development mode <--', :on_red) if development
 if development
   db_path = File.join(File.dirname(__FILE__), 'dev.db')
   # uncomment the following line to see database output in dev mode
@@ -25,6 +25,7 @@ DataMapper.finalize
 DataMapper.auto_upgrade!
 
 begin
+  system('clear')
   list = List.first || List.new
   if ARGV[0]
     if list.methods.include? ARGV[0]

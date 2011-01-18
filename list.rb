@@ -115,7 +115,7 @@ class List
     if identifier and identifier.match(/(\d+)x/)
       count = Integer($1)
       count.times do
-        Task.first.destroy
+        Task.first(:order => [ :ordering.asc ]).destroy
       end
     elsif identifier
       begin
@@ -146,24 +146,9 @@ class List
     # if they input a number greater than or equal to the number of tasks
     raise "I don't like walking in circles" if number.abs >= Task.count
     invert_set = []
-    Task.all(:order => [:ordering.asc]).each do |task|
+    Task.all(:limit => number, :order => [:ordering.asc]).each do |task|
       # decrease the ordering of all the tasks by number
-      task.ordering -= number
-      invert_set << task if task.ordering <= 0
-      task.save
-    end
-
-    invert_set.each do |task|
-      # move the tasks with an ordering <= 0 to the end of the list
-      ordering = [Task.max(:ordering), 0].max
-      task.ordering =  ordering + 1
-      task.save
-    end
-
-    while Task.min(:ordering) > 1 do
-      # fill in the ordering gaps at the beginning of the list, in case user inputs a negative number
-      task = Task.first(:ordering => Task.max(:ordering))
-      task.ordering = Task.min(:ordering) - 1
+      task.ordering = Task.max(:ordering) + 1
       task.save
     end
 
