@@ -78,6 +78,7 @@ class List
   def tag(identifier=nil)
     if identifier.nil?
       puts 'listing of tags'
+      puts '-' * 40
       Tag.each do |tag|
         puts tag.title
       end
@@ -90,20 +91,22 @@ class List
       if a == ''
         raise 'you need to enter a tag name'
       else
-        t = Tag.first(:title => a) || Tag.new(title)
+        t = Tag.first(:title => a) || Tag.new(a)
         task.tags << t
         task.save
         puts "Tag added -> #{t.title}"
       end
     elsif identifier == ''
       puts "items without tags"
-      Task.all.each do |task|
-        puts task if task.tags.empty?
+      puts '-' * 40
+      Task.all(:order => [ :ordering.asc ]).each_with_index do |task, index|
+        puts "#{index+1}. #{task}" if task.tags.empty?
       end
     else
       puts "listing tasks associated with tag -> #{identifier}"
-      Task.all.each do |task|
-        puts task if task.tags.collect{|tasktag| tasktag.title}.include? identifier
+      puts '-' * 40
+      Task.all(:order => [ :ordering.asc ]).each_with_index do |task, index|
+        puts "#{index+1}. #{task}" if task.tags.collect{|tasktag| tasktag.title}.include? identifier
       end
     end
   end
