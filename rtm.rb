@@ -88,19 +88,32 @@ class Milker
     args = standard_args.merge('method' => 'rtm.tasks.getList', 'filter' => "status:incomplete AND (dueBefore:today OR due:today)")
     args['api_sig'] = get_signed(args)
     response = get_response(args)
-    a = JSON.parse(response.body)['rsp']['tasks']['list']
+    body = JSON.parse(response.body)['rsp']['tasks']['list']
+    parse_lists(body)
+  end
+
+  def parse_lists(lists)
     ourlist = []
-    a.each do |list|
-      series = list['taskseries']
-      if series.is_a? Array
-        series.each do |item|
-          ourlist << item['name']
-        end
-      else
-        ourlist << list['taskseries']['name']
+    if lists.is_a? Hash
+      ourlist += parse_series(lists['taskseries'])
+    else
+      lists.each do |list|
+        ourlist += parse_series(list['taskseries'])
       end
     end
     ourlist
+  end
+
+  def parse_series(series)
+    ourseries = []
+    if series.is_a? Array
+      series.each do |item|
+        ourseries << item['name']
+      end
+    else
+      ourseries << series['name']
+    end
+    ourseries
   end
 
   def check_token
