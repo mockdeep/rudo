@@ -1,0 +1,21 @@
+#!/usr/bin/env ruby
+require 'rudo'
+require 'trollop'
+
+init_options = Trollop::options do
+  opt :file_path, "Alternate path to list, default ~/rudo.yml", :default => '~/rudo.yml'
+end
+
+print_options = Trollop::options do
+  opt :color, "Print with colors", :default => true
+end
+
+begin
+  position = Integer(ARGV[1]) - 1
+rescue
+  position = 0
+end
+
+r = Rudo.new(init_options)
+r.add(ARGV[0], position)
+r.print(print_options)

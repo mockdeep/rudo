@@ -129,7 +129,7 @@ class Milker
   end
 end
 
-class List
+class Rudo
   def rtm_add
     a = Milker.new
     a.get_todays_tasks.each do |task|
