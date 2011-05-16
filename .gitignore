@@ -2,3 +2,4 @@
 *~
 *.db
 cred.rb
+*.gem
