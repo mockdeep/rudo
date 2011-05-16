@@ -13,7 +13,7 @@ class Rudo
     colored = options.delete(:color) { true }
     puts "*" * 40
     @tasks.each_with_index do |task, index|
-      puts "#{index}: #{task}"
+      puts "#{index + 1}: #{task}"
     end
     puts "*" * 40
     if colored
