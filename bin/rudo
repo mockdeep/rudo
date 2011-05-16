@@ -2,13 +2,10 @@
 require 'rudo'
 require 'trollop'
 
-init_options = Trollop::options do
+options = Trollop::options do
   opt :file_path, "Alternate path to list, default ~/rudo.yml", :default => '~/rudo.yml'
-end
-
-print_options = Trollop::options do
   opt :color, "Print with colors", :default => true
 end
 
-r = Rudo.new(init_options)
-r.print(print_options)
+r = Rudo.new(options)
+r.print(options)
