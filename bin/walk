@@ -10,11 +10,7 @@ print_options = Trollop::options do
   opt :color, "Print with colors", :default => true
 end
 
-begin
-  steps = Integer(ARGV[1])
-rescue
-  steps = 1
-end
+steps = ARGV[0] ? Integer(ARGV[0]) : 1
 
 r = Rudo.new(init_options)
 r.walk(steps)
