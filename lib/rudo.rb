@@ -12,8 +12,8 @@ class Rudo
   def print(options={})
     colored = options.delete(:color) { true }
     puts "*" * 40
-    @tasks.each do |task|
-      puts task
+    @tasks.each_with_index do |task, index|
+      puts "#{index}: #{task}"
     end
     puts "*" * 40
     if colored
