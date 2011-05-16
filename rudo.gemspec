@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{rudo}
-  s.version = "0.0.1"
+  s.version = "0.0.2"
   s.date = %q{2011-05-15}
   s.authors = ["Robert Fletcher"]
   s.email = %q{lobatifricha@gmail.com}
@@ -10,6 +10,9 @@ Gem::Specification.new do |s|
   s.files = %w[
     lib/rudo.rb
     bin/rudo
+    bin/add
+    bin/dun
+    bin/walk
   ]
-  s.executables = ["rudo"]
+  s.executables = ["rudo", "add", "dun", "walk"]
 end

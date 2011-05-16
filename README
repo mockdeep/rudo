@@ -23,6 +23,3 @@ walk
 
 # move the first 3 items to the back of the list
 walk 3
-
-# add in tasks from Remember the Milk
-rudo rtm_add
