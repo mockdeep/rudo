@@ -10,9 +10,9 @@ Gem::Specification.new do |s|
   s.files = %w[
     lib/rudo.rb
     bin/rudo
-    bin/add
+    bin/rad
     bin/dun
     bin/walk
   ]
-  s.executables = ["rudo", "add", "dun", "walk"]
+  s.executables = ["rudo", "rad", "dun", "walk"]
 end
