@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{rudo}
-  s.version = "0.0.7"
+  s.version = "0.0.8"
   s.date = %q{2011-05-15}
   s.authors = ["Robert Fletcher"]
   s.email = %q{lobatifricha@gmail.com}
@@ -15,4 +15,6 @@ Gem::Specification.new do |s|
     bin/walk
   ]
   s.executables = ["rudo", "rad", "dun", "walk"]
+  s.add_dependency('colored', '>= 1.2')
+  s.add_dependency('trollop', '>= 1.16.2')
 end
