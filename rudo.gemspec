@@ -1,7 +1,7 @@
 Gem::Specification.new do |s|
   s.name = %q{rudo}
-  s.version = "0.0.8"
-  s.date = %q{2011-05-15}
+  s.version = "0.0.11"
+  s.date = %q{2011-07-01}
   s.authors = ["Robert Fletcher"]
   s.email = %q{lobatifricha@gmail.com}
   s.summary = %q{A simple, semi-pretty command line based todo list manager}

@@ -7,12 +7,6 @@ options = Trollop::options do
   opt :color, "Print with colors", :default => true
 end
 
-begin
-  selection = Integer(ARGV[0]) - 1
-rescue
-  selection = ARGV[0]
-end
-
 r = Rudo.new(options)
-r.remove(selection)
+r.remove(ARGV[0])
 r.print(options)

@@ -29,13 +29,14 @@ class Rudo
     write_tasks
   end
 
-  def remove(position=nil)
-    position ||= 0
+  def remove(position=1)
     if position.is_a?(String) && position.match(/^(\d+)x/)
       count = Integer($1)
       count.times { @tasks.shift }
     else
-      @tasks.delete_at(Integer(position))
+      position = position.to_i
+      position -= 1 if position > 0
+      @tasks.delete_at(position)
     end
     write_tasks
   end
@@ -54,5 +55,6 @@ private
     File.open(@file_path, 'w') do |file|
       file.write(YAML.dump(@tasks))
     end
+    true
   end
 end
