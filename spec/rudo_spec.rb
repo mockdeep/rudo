@@ -11,15 +11,13 @@ describe Rudo do
   end
 
   describe "#print" do
-
     def stars
       '*' * 40
     end
 
     context "when the color option is set to false" do
-
       before(:each) do
-        file =  File.open('spec/fixtures/empty.yml')
+        file = File.open('spec/fixtures/empty.yml')
         File.stub(:open).and_return(file)
       end
 
@@ -32,7 +30,6 @@ describe Rudo do
     end
 
     context "when there are no tasks" do
-
       before(:each) do
         file =  File.open('spec/fixtures/empty.yml')
         File.stub(:open).and_return(file)
@@ -47,7 +44,6 @@ describe Rudo do
     end
 
     context "when there are two tasks" do
-
       before(:each) do
         file =  File.open('spec/fixtures/twotasks.yml')
         File.stub(:open).and_return(file)
@@ -63,8 +59,6 @@ describe Rudo do
         r.print
       end
     end
-
   end
 
 end
-
