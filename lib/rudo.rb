@@ -11,11 +11,11 @@ class Rudo
 
   def print(options={})
     colored = options.delete(:color) { true }
-    puts "*" * 40
+    puts stars
     @tasks.each_with_index do |task, index|
       puts "#{index + 1}: #{task}"
     end
-    puts "*" * 40
+    puts stars
     if colored
       puts "#{@tasks.length} tasks remaining".green
     else
@@ -50,6 +50,10 @@ class Rudo
   end
 
 private
+
+  def stars
+    "*" * 40
+  end
 
   def write_tasks
     File.open(@file_path, 'w') do |file|
