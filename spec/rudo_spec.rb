@@ -5,18 +5,17 @@ require 'spec_helper'
 require './lib/rudo.rb'
 
 describe Rudo do
-  before :each do
-    @empty_path = 'spec/fixtures/empty.yml'
-    @two_path = 'spec/fixtures/twotasks.yml'
+  before(:each) do
+    @empty_path = './spec/fixtures/empty.yml'
+    @tasks_path = './spec/fixtures/tasks.yml'
     @stars = '*' * 40
+    File.stub(:write)
   end
 
   describe '#print' do
     context 'when the color option is set to false' do
       before(:each) do
-        file = File.open(@empty_path)
-        File.stub(:open).and_return(file)
-        @rudo = Rudo.new
+        @rudo = Rudo.new(:file_path => @empty_path)
       end
 
       it 'does not color output' do
@@ -28,9 +27,7 @@ describe Rudo do
 
     context 'when there are no tasks' do
       before(:each) do
-        file =  File.open(@empty_path)
-        File.stub(:open).and_return(file)
-        @rudo = Rudo.new
+        @rudo = Rudo.new(:file_path => @empty_path)
         @rudo.stub(:puts).with(@stars)
         @rudo.stub(:puts).with('0 tasks remaining'.green)
       end
@@ -46,44 +43,43 @@ describe Rudo do
       end
     end
 
-    context 'when there are two tasks' do
+    context 'when there are tasks' do
       before(:each) do
-        file =  File.open(@two_path)
-        File.stub(:open).and_return(file)
-        @rudo = Rudo.new
+        @rudo = Rudo.new(:file_path => @tasks_path)
         @rudo.stub(:puts).with(@stars)
         @rudo.stub(:puts).with('1: clean gutters')
         @rudo.stub(:puts).with('2: do laundry')
-        @rudo.stub(:puts).with('2 tasks remaining'.green)
+        @rudo.stub(:puts).with('3: eat pizza')
+        @rudo.stub(:puts).with('3 tasks remaining'.green)
       end
 
-      it 'prints both tasks between rows of stars' do
+      it 'prints tasks between rows of stars' do
         @rudo.should_receive(:puts).with(@stars)
         @rudo.should_receive(:puts).with('1: clean gutters')
         @rudo.should_receive(:puts).with('2: do laundry')
+        @rudo.should_receive(:puts).with('3: eat pizza')
         @rudo.should_receive(:puts).with(@stars)
         @rudo.print
       end
 
       it 'prints the task count in green' do
-        @rudo.should_receive(:puts).with('2 tasks remaining'.green)
+        @rudo.should_receive(:puts).with('3 tasks remaining'.green)
         @rudo.print
       end
     end
   end
 
   describe '#add' do
-    before :each do
-      yaml = YAML.load(File.open(@two_path))
-      YAML.stub(:load).and_return(yaml)
-      @tasks = yaml
-      @rudo = Rudo.new
+    before(:each) do
+      @tasks = YAML.load(File.read(@tasks_path))
+      @rudo = Rudo.new(:file_path => @tasks_path)
     end
 
     context 'when position is nil' do
       it 'adds the task at the end of the list' do
         @tasks += ['blah']
-        File.any_instance.should_receive(:write).with(YAML.dump(@tasks))
+        File.should_receive(:write).
+          with(File.expand_path(@tasks_path), YAML.dump(@tasks))
         @rudo.add('blah')
       end
     end
@@ -91,12 +87,87 @@ describe Rudo do
     context 'when position is given' do
       it 'adds the task at that position in the list' do
         @tasks = ['blah'] + @tasks
-        File.any_instance.should_receive(:write).with(YAML.dump(@tasks))
+        File.should_receive(:write).
+          with(File.expand_path(@tasks_path), YAML.dump(@tasks))
         @rudo.add('blah', 0)
       end
     end
   end
 
-  describe '#remove'
-  describe '#walk'
+  describe '#remove' do
+    before(:each) do
+      @tasks = YAML.load(File.read(@tasks_path))
+      @rudo = Rudo.new(:file_path => @tasks_path)
+    end
+
+    context 'when position is some number followed by an "x"' do
+      it 'removes the first n items' do
+        expected_tasks = @tasks[2..-1]
+        File.should_receive(:write).
+          with(File.expand_path(@tasks_path), YAML.dump(expected_tasks))
+        @rudo.remove('2x')
+      end
+    end
+
+    context 'when the position is a number' do
+      it 'removes the item specified' do
+        expected_tasks = [ @tasks.first, @tasks.last ]
+        File.should_receive(:write).
+          with(File.expand_path(@tasks_path), YAML.dump(expected_tasks))
+        @rudo.remove('2')
+      end
+    end
+
+    context 'when the position is trash text' do
+      it 'removes the first item in the list' do
+        expected_tasks = @tasks[1..-1]
+        File.should_receive(:write).
+          with(File.expand_path(@tasks_path), YAML.dump(expected_tasks))
+        @rudo.remove('trash')
+      end
+    end
+
+    context 'when the position is nil' do
+      it 'removes the first item in the list' do
+        expected_tasks = @tasks[1..-1]
+        File.should_receive(:write).
+          with(File.expand_path(@tasks_path), YAML.dump(expected_tasks))
+        @rudo.remove(nil)
+      end
+    end
+
+    context 'when the position is not given' do
+      it 'removes the first item in the list' do
+        expected_tasks = @tasks[1..-1]
+        File.should_receive(:write).
+          with(File.expand_path(@tasks_path), YAML.dump(expected_tasks))
+        @rudo.remove
+      end
+    end
+  end
+
+  describe '#walk' do
+    before(:each) do
+      @tasks = YAML.load(File.read(@tasks_path))
+      @rudo = Rudo.new(:file_path => @tasks_path)
+    end
+
+    context 'when no argument is given' do
+      it 'moves the first item in the list to the end' do
+        expected_tasks = @tasks[1..-1] + @tasks[0, 1]
+        File.should_receive(:write).
+          with(File.expand_path(@tasks_path), YAML.dump(expected_tasks))
+        @rudo.walk
+      end
+    end
+
+    context 'when a number is given' do
+      it 'moves n items to the end of the list' do
+        expected_tasks = @tasks[2..-1] + @tasks[0, 2]
+        File.should_receive(:write).
+          with(File.expand_path(@tasks_path), YAML.dump(expected_tasks))
+        @rudo.walk(2)
+      end
+    end
+  end
 end
