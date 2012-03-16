@@ -6,7 +6,7 @@ class Rudo
   def initialize(options={})
     @file_path = File.expand_path(options.delete(:file_path) { '~/rudo.yml' })
 
-    @tasks = YAML.load(File.open(@file_path))
+    @tasks = YAML.load(File.read(@file_path))
   end
 
   def print(options={})
@@ -56,9 +56,6 @@ private
   end
 
   def write_tasks
-    File.open(@file_path, 'w') do |file|
-      file.write(YAML.dump(@tasks))
-    end
-    true
+    File.write(@file_path, YAML.dump(@tasks))
   end
 end
