@@ -6,8 +6,8 @@ require './lib/rudo.rb'
 
 describe Rudo do
   before(:each) do
-    @empty_path = './spec/fixtures/empty.yml'
-    @tasks_path = './spec/fixtures/tasks.yml'
+    @empty_path = File.expand_path('./spec/fixtures/empty.yml')
+    @tasks_path = File.expand_path('./spec/fixtures/tasks.yml')
     @stars = '*' * 40
     File.stub(:write)
   end
@@ -77,18 +77,16 @@ describe Rudo do
 
     context 'when position is nil' do
       it 'adds the task at the end of the list' do
-        @tasks += ['blah']
-        File.should_receive(:write).
-          with(File.expand_path(@tasks_path), YAML.dump(@tasks))
+        expected_tasks = @tasks + ['blah']
+        File.should_receive(:write).with(@tasks_path, YAML.dump(expected_tasks))
         @rudo.add('blah')
       end
     end
 
     context 'when position is given' do
       it 'adds the task at that position in the list' do
-        @tasks = ['blah'] + @tasks
-        File.should_receive(:write).
-          with(File.expand_path(@tasks_path), YAML.dump(@tasks))
+        expected_tasks = ['blah'] + @tasks
+        File.should_receive(:write).with(@tasks_path, YAML.dump(expected_tasks))
         @rudo.add('blah', 0)
       end
     end
@@ -103,8 +101,7 @@ describe Rudo do
     context 'when position is some number followed by an "x"' do
       it 'removes the first n items' do
         expected_tasks = @tasks[2..-1]
-        File.should_receive(:write).
-          with(File.expand_path(@tasks_path), YAML.dump(expected_tasks))
+        File.should_receive(:write).with(@tasks_path, YAML.dump(expected_tasks))
         @rudo.remove('2x')
       end
     end
@@ -112,8 +109,7 @@ describe Rudo do
     context 'when the position is a number' do
       it 'removes the item specified' do
         expected_tasks = [ @tasks.first, @tasks.last ]
-        File.should_receive(:write).
-          with(File.expand_path(@tasks_path), YAML.dump(expected_tasks))
+        File.should_receive(:write).with(@tasks_path, YAML.dump(expected_tasks))
         @rudo.remove('2')
       end
     end
@@ -121,8 +117,7 @@ describe Rudo do
     context 'when the position is trash text' do
       it 'removes the first item in the list' do
         expected_tasks = @tasks[1..-1]
-        File.should_receive(:write).
-          with(File.expand_path(@tasks_path), YAML.dump(expected_tasks))
+        File.should_receive(:write).with(@tasks_path, YAML.dump(expected_tasks))
         @rudo.remove('trash')
       end
     end
@@ -130,8 +125,7 @@ describe Rudo do
     context 'when the position is nil' do
       it 'removes the first item in the list' do
         expected_tasks = @tasks[1..-1]
-        File.should_receive(:write).
-          with(File.expand_path(@tasks_path), YAML.dump(expected_tasks))
+        File.should_receive(:write).with(@tasks_path, YAML.dump(expected_tasks))
         @rudo.remove(nil)
       end
     end
@@ -139,8 +133,7 @@ describe Rudo do
     context 'when the position is not given' do
       it 'removes the first item in the list' do
         expected_tasks = @tasks[1..-1]
-        File.should_receive(:write).
-          with(File.expand_path(@tasks_path), YAML.dump(expected_tasks))
+        File.should_receive(:write).with(@tasks_path, YAML.dump(expected_tasks))
         @rudo.remove
       end
     end
@@ -155,8 +148,7 @@ describe Rudo do
     context 'when no argument is given' do
       it 'moves the first item in the list to the end' do
         expected_tasks = @tasks[1..-1] + @tasks[0, 1]
-        File.should_receive(:write).
-          with(File.expand_path(@tasks_path), YAML.dump(expected_tasks))
+        File.should_receive(:write).with(@tasks_path, YAML.dump(expected_tasks))
         @rudo.walk
       end
     end
@@ -164,8 +156,7 @@ describe Rudo do
     context 'when a number is given' do
       it 'moves n items to the end of the list' do
         expected_tasks = @tasks[2..-1] + @tasks[0, 2]
-        File.should_receive(:write).
-          with(File.expand_path(@tasks_path), YAML.dump(expected_tasks))
+        File.should_receive(:write).with(@tasks_path, YAML.dump(expected_tasks))
         @rudo.walk(2)
       end
     end
