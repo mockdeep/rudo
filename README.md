@@ -1,3 +1,5 @@
+![status](https://secure.travis-ci.org/mockdeep/rudo.png?branch=master)
+
 Rudo is a simple command line based todo list editor.  Here are the commands:
 
 # see the first n items on the list (default 5)
