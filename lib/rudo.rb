@@ -1,6 +1,7 @@
 require 'rubygems'
 require 'colored'
 require 'yaml'
+require 'rudo/list'
 
 class Rudo
   def initialize(options={})
