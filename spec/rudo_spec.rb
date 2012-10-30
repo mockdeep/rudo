@@ -10,16 +10,6 @@ describe Rudo do
   end
 
   describe '#print' do
-    context 'when the color option is set to false' do
-      let(:rudo) { Rudo.new(:file_path => empty_path) }
-
-      it 'does not color output' do
-        rudo.should_receive(:puts).with(stars).twice
-        rudo.should_receive(:puts).with('0 tasks remaining')
-        rudo.print({:color => false})
-      end
-    end
-
     context 'when there are no tasks' do
       let(:rudo) { Rudo.new(:file_path => empty_path) }
 
@@ -149,6 +139,31 @@ describe Rudo do
         expected_tasks = tasks[2..-1] + tasks[0, 2]
         File.should_receive(:write).with(tasks_path, YAML.dump(expected_tasks))
         rudo.walk(2)
+      end
+    end
+  end
+
+  describe '#to_s' do
+    context 'when there are no tasks' do
+      let(:rudo) { Rudo.new(:file_path => empty_path) }
+
+      it "returns two lines of stars and 0 tasks remaining" do
+        expected = "#{stars}\n#{stars}\n#{"0 tasks remaining".green}"
+        rudo.to_s.should == expected
+      end
+    end
+
+    context 'when there are tasks' do
+      let(:rudo) { Rudo.new(:file_path => tasks_path) }
+
+      it "returns the task with the count in green" do
+        expected = "#{stars}\n"
+        expected << "1: clean gutters\n"
+        expected << "2: do laundry\n"
+        expected << "3: eat pizza\n"
+        expected << "#{stars}\n"
+        expected << "3 tasks remaining".green
+        rudo.to_s.should == expected
       end
     end
   end

@@ -10,16 +10,8 @@ class Rudo
   end
 
   def print(options={})
-    colored = options.delete(:color) { true }
-    puts stars
-    @tasks.each_with_index do |task, index|
-      puts "#{index + 1}: #{task}"
-    end
-    puts stars
-    if colored
-      puts "#{@tasks.length} tasks remaining".green
-    else
-      puts "#{@tasks.length} tasks remaining"
+    self.to_s.each_line do |line|
+      puts line.strip
     end
   end
 
@@ -47,6 +39,17 @@ class Rudo
       @tasks << task
     end
     write_tasks
+  end
+
+  def to_s
+    string = "#{stars}\n"
+
+    @tasks.each_with_index do |task, index|
+      string << "#{index + 1}: #{task}\n"
+    end
+
+    string << "#{stars}\n"
+    string << "#{@tasks.length} tasks remaining".green
   end
 
 private
