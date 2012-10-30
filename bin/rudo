@@ -8,4 +8,4 @@ options = Trollop::options do
 end
 
 r = Rudo.new(options)
-r.print(options)
+puts r

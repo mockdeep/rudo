@@ -10,12 +10,6 @@ class Rudo
     @tasks = YAML.load(File.read(@file_path))
   end
 
-  def print(options={})
-    self.to_s.each_line do |line|
-      puts line.strip
-    end
-  end
-
   def add(task, position=nil)
     position ||= @tasks.length
     @tasks.insert(position, task)

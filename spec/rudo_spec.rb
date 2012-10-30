@@ -9,53 +9,6 @@ describe Rudo do
     File.stub(:write)
   end
 
-  describe '#print' do
-    context 'when there are no tasks' do
-      let(:rudo) { Rudo.new(:file_path => empty_path) }
-
-      before(:each) do
-        rudo.stub(:puts).with(stars)
-        rudo.stub(:puts).with('0 tasks remaining'.green)
-      end
-
-      it 'prints two lines of stars' do
-        rudo.should_receive(:puts).with(stars).twice
-        rudo.print
-      end
-
-      it 'prints "0 tasks remaining" in green' do
-        rudo.should_receive(:puts).with('0 tasks remaining'.green)
-        rudo.print
-      end
-    end
-
-    context 'when there are tasks' do
-      let(:rudo) { Rudo.new(:file_path => tasks_path) }
-
-      before(:each) do
-        rudo.stub(:puts).with(stars)
-        rudo.stub(:puts).with('1: clean gutters')
-        rudo.stub(:puts).with('2: do laundry')
-        rudo.stub(:puts).with('3: eat pizza')
-        rudo.stub(:puts).with('3 tasks remaining'.green)
-      end
-
-      it 'prints tasks between rows of stars' do
-        rudo.should_receive(:puts).with(stars)
-        rudo.should_receive(:puts).with('1: clean gutters')
-        rudo.should_receive(:puts).with('2: do laundry')
-        rudo.should_receive(:puts).with('3: eat pizza')
-        rudo.should_receive(:puts).with(stars)
-        rudo.print
-      end
-
-      it 'prints the task count in green' do
-        rudo.should_receive(:puts).with('3 tasks remaining'.green)
-        rudo.print
-      end
-    end
-  end
-
   describe '#add' do
     let(:tasks) { YAML.load(File.read(tasks_path)) }
     let(:rudo) { Rudo.new(:file_path => tasks_path) }

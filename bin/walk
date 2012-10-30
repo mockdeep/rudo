@@ -11,4 +11,4 @@ steps = ARGV[0] ? Integer(ARGV[0]) : 1
 
 r = Rudo.new(options)
 r.walk(steps)
-r.print(options)
+puts r

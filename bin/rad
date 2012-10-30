@@ -15,4 +15,4 @@ end
 
 r = Rudo.new(options)
 r.add(ARGV[0], position)
-r.print(options)
+puts r
