@@ -29,10 +29,7 @@ class Rudo
   end
 
   def walk(steps=1)
-    steps.times do
-      task = @tasks.shift
-      @tasks << task
-    end
+    steps.times { @tasks << @tasks.shift }
     write_tasks
   end
 
