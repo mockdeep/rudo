@@ -9,6 +9,6 @@ end
 
 steps = ARGV[0] ? Integer(ARGV[0]) : 1
 
-r = Rudo.new(options)
-r.walk(steps)
-puts r
+list = Rudo.new(options)
+list.walk(steps)
+puts list

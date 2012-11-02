@@ -13,6 +13,6 @@ rescue
   position = 0
 end
 
-r = Rudo.new(options)
-r.add(ARGV[0], position)
-puts r
+list = Rudo.new(options)
+list.add(ARGV[0], position)
+puts list
