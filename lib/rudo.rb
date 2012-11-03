@@ -44,7 +44,7 @@ class Rudo
     string << "#{@tasks.length} tasks remaining".green
   end
 
-private
+  private
 
   def stars
     "*" * 40
