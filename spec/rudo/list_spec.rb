@@ -111,7 +111,8 @@ describe Rudo::List do
 
     context "given an integer value" do
       it "moves that many elements to the end" do
-        expected_tasks = tasks.rotate(2)
+        expected_tasks = tasks.dup
+        2.times { expected_tasks << expected_tasks.shift }
         expect {
           list.walk(2)
         }.to change(list, :tasks).to(expected_tasks)
