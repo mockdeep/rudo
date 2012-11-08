@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = %q{rudo}
-  s.version = "0.2.1"
+  s.version = "0.3.0"
   s.date = %q{2012-04-15}
   s.authors = ["Robert Fletcher"]
   s.email = %q{lobatifricha@gmail.com}
