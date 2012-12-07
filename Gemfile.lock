@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rudo (0.2.1)
+    rudo (0.3.0)
       colored (>= 1.2)
       trollop (>= 1.16.2)
 
